@@ -13,7 +13,7 @@ load_dotenv()
 def print_review_item(item):
   for key, value in item.items():
     # key name, then a newline, then the value
-    print(f"{key}\n\n{value}\n\n")
+    print(f"{key}:\n{value}\n")
   print("========")
 
 
@@ -22,8 +22,8 @@ def main():
 
   # TODO: The repo path should be a CLI param
   # TODO: The commits should be CLI params
-  start_commit = "510731030"
-  end_commit = "d7825b51669e"
+  start_commit = "adb0a79ab57"
+  end_commit = "506fd93ce7e"
 
   files = list_files_changed(start_commit, end_commit)
   print(files)
