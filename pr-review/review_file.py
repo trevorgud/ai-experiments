@@ -14,6 +14,21 @@ def persona_prompt(file_contents):
   return prompt
 
 
+def format_prompt():
+  return """
+    Respond with a list of objects, or empty list if nothing found.
+    Each item will have these fields:
+    - description: a description of the findings
+    - code_snippet: the snippet of code this entry refers to
+    - start_line: the line in the file where the current snippet starts
+    - end_line: the line in the file where the current snippet ends
+    - confidence: how confident are you that this is a real finding (0-10)
+    - severity: what is the severity of the finding (0-10)
+    - effort: how much effort would be required to resolve (0-10)
+    - category: give the finding a categorization
+  """
+
+
 def user_bug_prompt(diff):
   task = f"""Tell me if there are any bugs introduced in this change. If no bugs, leave an empty array. Here is the diff: ```\n"""
   prompt = task+diff
@@ -33,18 +48,22 @@ def issue_format(issue_type):
             "type": "object",
             "properties": {
               "description":   { "type": "string" },
-              "problem_code":  { "type": "string" },
+              "code_snippet":  { "type": "string" },
               "start_line":    { "type": "integer" },
               "end_line":      { "type": "integer" },
+              "confidence":    { "type": "number" },
               "severity":      { "type": "number" },
+              "effort":        { "type": "number" },
               "category":      { "type": "string" }
             },
             "required": [
               "description",
-              "problem_code",
+              "code_snippet",
               "start_line",
               "end_line",
+              "confidence",
               "severity",
+              "effort",
               "category"
             ],
             "additionalProperties": False
@@ -91,8 +110,11 @@ def review_bugs(client, file_path, start_commit, end_commit):
   diff = git_diff(file_path, start_commit, end_commit)
   user_prompt = user_bug_prompt(diff)
 
+  fp = format_prompt()
+
   prompts = [
     {"role": "system", "content": system_prompt},
+    {"role": "system", "content": fp},
     {"role": "user", "content": user_prompt},
   ]
   response_format = {"format": issue_format("bugs")}
@@ -115,8 +137,11 @@ def review_refactorings(client, file_path, start_commit, end_commit):
   diff = git_diff(file_path, start_commit, end_commit)
   user_prompt = user_refactoring_prompt(diff)
 
+  fp = format_prompt()
+
   prompts = [
     {"role": "system", "content": system_prompt},
+    {"role": "system", "content": fp},
     {"role": "user", "content": user_prompt},
   ]
   response_format = {"format": issue_format("refactorings")}

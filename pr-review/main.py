@@ -17,13 +17,22 @@ def print_review_item(item):
   print("========")
 
 
+def priority_metric(item):
+  severity = item["severity"]
+  effort = item["effort"]
+  confidence = item["confidence"]
+  pad = 0.01
+  pm = (severity + confidence) / (effort + pad)
+  return pm
+
+
 def main():
   client = OpenAI()
 
   # TODO: The repo path should be a CLI param
   # TODO: The commits should be CLI params
-  start_commit = "adb0a79ab57"
-  end_commit = "506fd93ce7e"
+  start_commit = "417d46676057"
+  end_commit = "03467aa1b66a5"
 
   files = list_files_changed(start_commit, end_commit)
   print(files)
@@ -32,7 +41,11 @@ def main():
     file_bugs = review_file(client, file, start_commit, end_commit)
     for bug in file_bugs:
       bug["file"] = file
+      bug["priority"] = priority_metric(bug)
       bugs.append(bug)
+
+  bugs = sorted(bugs, key=lambda d: d['priority'])
+
   for bug in bugs:
     print_review_item(bug)
 
