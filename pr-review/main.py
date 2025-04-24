@@ -1,3 +1,5 @@
+import argparse
+
 from openai import OpenAI
 from dotenv import load_dotenv
 from config import *
@@ -28,13 +30,18 @@ def priority_metric(item):
 
 
 def main():
+  parser = argparse.ArgumentParser(
+    prog='AI PR Review',
+    description='Review a given PR with AI prompting',
+  )
+  parser.add_argument('--start-commit', help='The starting commit of the PR', dest="start_commit")
+  parser.add_argument('--end-commit', help='The ending commit of the PR', dest="end_commit")
+  args = parser.parse_args()
+
   client = OpenAI()
 
   # TODO: The repo path should be a CLI param
-  # TODO: The commits should be CLI params
-  start_commit = "417d46676057"
-  end_commit = "03467aa1b66a5"
-  git_params = GitParams(start_commit=start_commit, end_commit=end_commit)
+  git_params = GitParams(start_commit=args.start_commit, end_commit=args.end_commit)
 
   files = list_files_changed(git_params)
   print(files)
