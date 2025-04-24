@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from config import *
 
 from review_file import review_file
-from list_files import list_files_changed
+from git import list_files_changed
 
 
 # OPENAI_API_KEY loaded here

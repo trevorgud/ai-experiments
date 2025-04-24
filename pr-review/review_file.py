@@ -2,6 +2,7 @@ import json
 import subprocess
 
 from config import *
+from git import git_diff
 
 
 def persona_prompt(file_contents):
@@ -152,19 +153,3 @@ def review_refactorings(client, file_path, start_commit, end_commit):
   )
   j = json.loads(response.output_text)
   return j["refactorings"]
-
-
-def git_diff(file_path, start_commit, end_commit):
-  command = [
-    "git",
-    "-C",
-    REPO,
-    "diff",
-    start_commit,
-    end_commit,
-    "--",
-    file_path,
-  ]
-  output = subprocess.run(command, capture_output=True, text=True, check=True)
-  file_diff = output.stdout
-  return file_diff

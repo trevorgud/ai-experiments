@@ -1,5 +1,35 @@
 import subprocess
+
 from config import *
+
+
+# TODO: Replace each func param set with this single param object.
+class GitDiffParams():
+  def __init__(self, start_commit, end_commit):
+    self.start_commit = start_commit
+    self.end_commit = end_commit
+
+  def cli_params():
+    return [
+      start_commit,
+      end_commit,
+    ]
+
+
+def git_diff(file_path, start_commit, end_commit):
+  command = [
+    "git",
+    "-C",
+    REPO,
+    "diff",
+    start_commit,
+    end_commit,
+    "--",
+    file_path,
+  ]
+  output = subprocess.run(command, capture_output=True, text=True, check=True)
+  file_diff = output.stdout
+  return file_diff
 
 
 def list_files_changed(start_commit, end_commit):
