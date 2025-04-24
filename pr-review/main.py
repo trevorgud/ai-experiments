@@ -34,14 +34,18 @@ def main():
     prog='AI PR Review',
     description='Review a given PR with AI prompting',
   )
+  parser.add_argument('--repo-path', help='The path of the git repo', dest="repo_path")
   parser.add_argument('--start-commit', help='The starting commit of the PR', dest="start_commit")
   parser.add_argument('--end-commit', help='The ending commit of the PR', dest="end_commit")
   args = parser.parse_args()
 
-  client = OpenAI()
+  git_params = GitParams(
+    repo_path=args.repo_path,
+    start_commit=args.start_commit,
+    end_commit=args.end_commit
+  )
 
-  # TODO: The repo path should be a CLI param
-  git_params = GitParams(start_commit=args.start_commit, end_commit=args.end_commit)
+  client = OpenAI()
 
   files = list_files_changed(git_params)
   print(files)

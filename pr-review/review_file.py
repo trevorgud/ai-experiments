@@ -104,7 +104,7 @@ def review_file(client, file_path, params):
 def review_bugs(client, file_path, params):
   print(f"handling file for bugs {file_path}")
   file_contents = ""
-  with open(REPO+"/"+file_path, 'r') as file:
+  with open(params.repo_path+"/"+file_path, 'r') as file:
     file_contents = file.read()
   system_prompt = persona_prompt(file_contents)
 
@@ -131,7 +131,7 @@ def review_bugs(client, file_path, params):
 def review_refactorings(client, file_path, params):
   print(f"handling file for refactorings {file_path}")
   file_contents = ""
-  with open(REPO+"/"+file_path, 'r') as file:
+  with open(params.repo_path+"/"+file_path, 'r') as file:
     file_contents = file.read()
   system_prompt = persona_prompt(file_contents)
 
