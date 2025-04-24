@@ -1,10 +1,20 @@
+from abc import ABC, abstractmethod
 import subprocess
 
 from config import *
 
 
-# TODO: Replace each func param set with this single param object.
-class GitParams():
+class GitDiffParams(ABC):
+  # @abstractmethod
+  # def repo_path(self):
+  #   pass
+
+  @abstractmethod
+  def diff_params(self):
+    pass
+
+
+class GitDiffCommitParams(GitDiffParams):
   def __init__(self, repo_path, start_commit, end_commit):
     self.repo_path = repo_path
     self.start_commit = start_commit
@@ -15,6 +25,53 @@ class GitParams():
       self.start_commit,
       self.end_commit,
     ]
+
+
+class GitDiffBranchParams(GitDiffParams):
+  def __init__(self, repo_path, source_branch, target_branch):
+    self.repo_path = repo_path
+    self.source_branch = source_branch
+    self.target_branch = target_branch
+
+  def diff_params(self):
+    branch_expr = f"origin/{self.target_branch}...{self.source_branch}"
+    return [
+      branch_expr
+    ]
+
+
+def git_fetch_refs(params: GitDiffBranchParams):
+  base_branch=params.target_branch
+  pr_branch=params.source_branch
+  # Remote to use, may need to be configurable later.
+  remote = "origin"
+
+  base_ref = f"refs/heads/{base_branch}:refs/remotes/{remote}/{base_branch}"
+  pr_ref = f"refs/heads/{pr_branch}:refs/remotes/{remote}/{pr_branch}"
+
+  command = [
+    "git",
+    "-C",
+    params.repo_path,
+    "fetch",
+    "--prune",
+    "--no-tags",
+    remote,
+    base_ref,
+    pr_ref,
+  ]
+  subprocess.run(command, capture_output=True, text=True, check=True)
+
+
+def git_checkout_source(params: GitDiffBranchParams):
+  command = [
+    "git",
+    "-C",
+    params.repo_path,
+    "checkout",
+    params.source_branch,
+  ]
+  subprocess.run(command, capture_output=True, text=True, check=True)
 
 
 def git_diff(file_path, params):
