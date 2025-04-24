@@ -4,6 +4,7 @@ from config import *
 
 from review_file import review_file
 from git import list_files_changed
+from git import GitParams
 
 
 # OPENAI_API_KEY loaded here
@@ -33,12 +34,13 @@ def main():
   # TODO: The commits should be CLI params
   start_commit = "417d46676057"
   end_commit = "03467aa1b66a5"
+  git_params = GitParams(start_commit=start_commit, end_commit=end_commit)
 
-  files = list_files_changed(start_commit, end_commit)
+  files = list_files_changed(git_params)
   print(files)
   bugs = []
   for file in files:
-    file_bugs = review_file(client, file, start_commit, end_commit)
+    file_bugs = review_file(client, file, git_params)
     for bug in file_bugs:
       bug["file"] = file
       bug["priority"] = priority_metric(bug)

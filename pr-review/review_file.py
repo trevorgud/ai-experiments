@@ -94,21 +94,21 @@ def user_refactoring_prompt(diff):
 
 
 # Review the given file between the diffs and return the relevant findings.
-def review_file(client, file_path, start_commit, end_commit):
-  b = review_bugs(client, file_path, start_commit, end_commit)
-  r = review_refactorings(client, file_path, start_commit, end_commit)
+def review_file(client, file_path, params):
+  b = review_bugs(client, file_path, params)
+  r = review_refactorings(client, file_path, params)
   reviews = [*b, *r]
   return reviews
 
 
-def review_bugs(client, file_path, start_commit, end_commit):
+def review_bugs(client, file_path, params):
   print(f"handling file for bugs {file_path}")
   file_contents = ""
   with open(REPO+"/"+file_path, 'r') as file:
     file_contents = file.read()
   system_prompt = persona_prompt(file_contents)
 
-  diff = git_diff(file_path, start_commit, end_commit)
+  diff = git_diff(file_path, params)
   user_prompt = user_bug_prompt(diff)
 
   fp = format_prompt()
@@ -128,14 +128,14 @@ def review_bugs(client, file_path, start_commit, end_commit):
   return j["bugs"]
 
 
-def review_refactorings(client, file_path, start_commit, end_commit):
+def review_refactorings(client, file_path, params):
   print(f"handling file for refactorings {file_path}")
   file_contents = ""
   with open(REPO+"/"+file_path, 'r') as file:
     file_contents = file.read()
   system_prompt = persona_prompt(file_contents)
 
-  diff = git_diff(file_path, start_commit, end_commit)
+  diff = git_diff(file_path, params)
   user_prompt = user_refactoring_prompt(diff)
 
   fp = format_prompt()

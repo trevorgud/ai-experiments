@@ -4,26 +4,27 @@ from config import *
 
 
 # TODO: Replace each func param set with this single param object.
-class GitDiffParams():
+class GitParams():
   def __init__(self, start_commit, end_commit):
     self.start_commit = start_commit
     self.end_commit = end_commit
 
-  def cli_params():
+  def cli_params(self):
     return [
-      start_commit,
-      end_commit,
+      self.start_commit,
+      self.end_commit,
     ]
 
 
-def git_diff(file_path, start_commit, end_commit):
+def git_diff(file_path, params):
+  cli = params.cli_params()
   command = [
     "git",
     "-C",
     REPO,
     "diff",
-    start_commit,
-    end_commit,
+    # Spread the CLI params for this request in the appropriate location.
+    *cli,
     "--",
     file_path,
   ]
@@ -32,15 +33,16 @@ def git_diff(file_path, start_commit, end_commit):
   return file_diff
 
 
-def list_files_changed(start_commit, end_commit):
+def list_files_changed(params):
+  cli = params.cli_params()
   command = [
     "git",
     "-C",
     REPO,
     "diff",
     "--name-only",
-    start_commit,
-    end_commit,
+    # Spread the CLI params for this request in the appropriate location.
+    *cli,
   ]
   output = subprocess.run(command, capture_output=True, text=True, check=True)
   result = output.stdout
