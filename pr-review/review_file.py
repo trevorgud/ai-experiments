@@ -124,8 +124,12 @@ def review_bugs(client, file_path, params):
     input=prompts,
     text=response_format,
   )
-  j = json.loads(response.output_text)
-  return j["bugs"]
+  try:
+    j = json.loads(response.output_text)
+    return j["bugs"]
+  except Exception as e:
+    print(e)
+    return []
 
 
 def review_refactorings(client, file_path, params):
@@ -151,5 +155,9 @@ def review_refactorings(client, file_path, params):
     input=prompts,
     text=response_format,
   )
-  j = json.loads(response.output_text)
-  return j["refactorings"]
+  try:
+    j = json.loads(response.output_text)
+    return j["refactorings"]
+  except Exception as e:
+    print(e)
+    return []
